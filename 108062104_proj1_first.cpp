@@ -225,6 +225,8 @@ ostream& operator<<(ostream &output, const Matrix &m) {
 
 bool Matrix::movingBlock(Block* shape, int from, int mov)
 {
+    int h = shape->height;
+    int w = shape->width;
     int pos_r = 0;
     int pos_c = from;
     // 1st fall down
@@ -233,11 +235,11 @@ bool Matrix::movingBlock(Block* shape, int from, int mov)
     bool ground = 0;
     for(int i=0; i<row; i++) {
         tmp = (i < 3) ? (3-i) : 0;
-        for(int j=pos_c; j<pos_c+shape->width; j++) {
+        for(int j=pos_c; j<pos_c+w; j++) {
             for(int k=3; k>=tmp; k--) {
                 if( arr[i-3+k][j] && shape->arr[k][j-pos_c] ) {
                     ground = 1;
-                    if( pos_r-shape->height < 0 ) {
+                    if( pos_r-h < 0 ) {
                         valid = 0;
                         return valid;
                     }
@@ -251,7 +253,7 @@ bool Matrix::movingBlock(Block* shape, int from, int mov)
         else pos_r++;
     }
     // shift
-    if( (from + mov < 0) || (from + mov + shape->width > col) ) {
+    if( (from + mov < 0) || (from + mov + w > col) ) {
         valid = 0;
         return valid;
     }
@@ -272,11 +274,11 @@ bool Matrix::movingBlock(Block* shape, int from, int mov)
     ground = 0;
     for(int i=pos_r; i<row; i++) {
         tmp = (i < 3) ? (3-i) : 0;
-        for(int j=pos_c; j<pos_c+shape->width; j++) {
+        for(int j=pos_c; j<pos_c+w; j++) {
             for(int k=3; k>=tmp; k--) {
                 if( arr[i-3+k][j] && shape->arr[k][j-pos_c] ) {
                     ground = 1;
-                    if( pos_r-shape->height <= 0 ) {
+                    if( pos_r-h <= 0 ) {
                         valid = 0;
                         return valid;
                     }
@@ -290,8 +292,8 @@ bool Matrix::movingBlock(Block* shape, int from, int mov)
         else pos_r++;
     }
     // draw the game board
-    for(int i=3; i>3-shape->height; i--) {
-        for(int j=0; j<shape->width; j++) {
+    for(int i=3; i>3-h; i--) {
+        for(int j=0; j<w; j++) {
             if( shape->arr[i][j] ) {
                 arr[pos_r-3+i][pos_c+j] = 1;
             }
@@ -309,20 +311,18 @@ bool Matrix::movingBlock(Block* shape, int from, int mov)
             }
         }
     }
+    // eliminating
+    int eliminated = 0;
     for(int i=0; i<4; i++) {
         if( full[i] ) {
-            int tmp = pos_r-i;
+            int tmp = pos_r-i+eliminated;
             int* p = arr[tmp];
             for(int j=tmp; j>0; j--) {
                 arr[j] = arr[j-1];
             }
             arr[0] = p;
             fill(arr[0], arr[0]+col, 0);
-            for(int j=i; j<4-1; j++) {
-                full[j] = full[j+1];
-            }
-            full[4] = 0;
-            pos_r++;
+            eliminated++;
         }
     }
 
@@ -347,9 +347,11 @@ int main(int, char** argv)
             if( shape == "End" ) break;
             fin >> from >> mov;
             Block tmp(shape);
-            if( !game.movingBlock(&tmp, from-1, mov) ) {
+            bool valid = game.movingBlock(&tmp, from-1, mov);
+            if( !valid ) {
                 data = "invalid";
                 log << data;
+                cout << data;
                 break;
             }
             data = game.encode_output();
