@@ -268,6 +268,16 @@ bool Matrix::movingBlock(Block* shape, int from, int mov)
                 }
             }
         }
+        for(int i=pos_c-1; i>pos_c+mov; i--) {
+            for(int j=pos_r; j>pos_r-4; j--) {
+                for(int k=0; k<4; k++) {
+                    if( arr[j][i] && shape->arr[j][k] ) {
+                        valid = 0;
+                        return valid;
+                    }
+                }
+            }
+        }
     }
     pos_c += mov;
     // 2nd fall down
