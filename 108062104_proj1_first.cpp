@@ -237,6 +237,7 @@ bool Matrix::movingBlock(Block* shape, int from, int mov)
         tmp = (i < 3) ? (3-i) : 0;
         for(int j=pos_c; j<pos_c+w; j++) {
             for(int k=3; k>=tmp; k--) {
+                //printf("arr[%d][%d] && shape->arr[%d][%d]\n", i-3+k, j, k, j-pos_c);
                 if( arr[i-3+k][j] && shape->arr[k][j-pos_c] ) {
                     ground = 1;
                     if( pos_r-h < 0 ) {
@@ -309,7 +310,7 @@ bool Matrix::movingBlock(Block* shape, int from, int mov)
             }
         }
     }
-    cout << *this << endl;
+    //cout << *this << endl;
     // eliminate rows or not
     bool full[4];
     fill(full, full+4, 1);
@@ -354,6 +355,7 @@ int main(int, char** argv)
         string shape;
         int from, mov;
         while(fin >> shape) {
+            //cout << shape << endl;
             if( shape == "End" ) break;
             fin >> from >> mov;
             Block tmp(shape);
@@ -361,12 +363,12 @@ int main(int, char** argv)
             if( !valid ) {
                 data = "invalid";
                 log << data;
-                cout << data;
+                //cout << data;
                 break;
             }
             data = game.encode_output();
         }
-        cout << data;
+        //cout << data;
         log << data;
     }
     log.close();
